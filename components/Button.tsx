@@ -1,11 +1,11 @@
-import { ReactNode } from "react";
+import { ButtonHTMLAttributes, ReactNode } from "react";
 import styles from "./Button.module.css";
 
-interface Props {
+interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   className: string;
-  as: ReactNode;
+  children: ReactNode;
 }
 
-export default function Button({ className = "", as, ...props }: Props) {
+export default function Button({ className = "", ...props }: Props) {
   return <button className={`${styles.button} ${className}`} {...props} />;
 }

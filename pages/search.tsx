@@ -1,39 +1,38 @@
 import ProductList from "@/components/ProductList";
 import SearchForm from "@/components/SearchForm";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import axios from "@/lib/axios";
-import Header from "@/components/Header";
 import Container from "@/components/Container";
 import styles from "@/styles/Search.module.css";
 import Head from "next/head";
+import { GetServerSidePropsContext } from "next";
 
-export default function Search() {
-  const router = useRouter();
-  const q = router.query["q"];
-  const [products, setProducts] = useState<ProductType[]>([]);
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const q = context.query?.q;
 
-  const getProducts = async (query: string) => {
-    const res = await axios.get(`/products/?q=${query}`);
-    const nextProduct = res.data.results;
-    setProducts(nextProduct);
+  const res = await axios.get(`/products/?q=${q}`);
+  const products = res.data.results ?? [];
+
+  return {
+    props: {
+      products,
+      q,
+    },
   };
+}
 
-  useEffect(() => {
-    if (!q) {
-      return;
-    }
-    getProducts(q.toString());
-  }, [q]);
+interface Props {
+  products: ProductType[];
+  q: string;
+}
 
+export default function Search({ products, q }: Props) {
   return (
     <>
       <Head>
         <title>{q} 검색 결과 - Codeitmall</title>
       </Head>
-      <Header />
       <Container>
-        <SearchForm initialValue={q?.toString()} />
+        <SearchForm initialValue={q} />
         <h2 className={styles.title}>
           <span className={styles.keyword}>{q}</span> 검색 결과
         </h2>
